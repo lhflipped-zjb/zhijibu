@@ -1,0 +1,65 @@
+{
+  "task_id": "TASK-20260320-001",
+  "task_name": "甲乙型流感儿童患者用新任务处方开发",
+  "start_time": "2026-03-23 09:33:16",
+  "update_time": "2026-03-23 09:33:16",
+  "overall_progress": 11,
+  "status": "进行中",
+  "agents": {
+    "pm": {
+      "name": "PM大龙虾",
+      "role": "项目总控",
+      "icon": "🦞",
+      "status": "running",
+      "progress": 10,
+      "activity": "协调任务",
+      "stage": "任务调度",
+      "next_step": "派发任务",
+      "last_update": "2026-03-23 09:33:16"
+    },
+    "formulation": {
+      "name": "小龙虾-处方工艺",
+      "role": "处方设计",
+      "icon": "💊",
+      "status": "running",
+      "progress": 45,
+      "activity": "Top1处方已落表，VA64方案已同步",
+      "stage": "首版落表完成",
+      "next_step": "补充辅料细节",
+      "last_update": "2026-03-23 09:33:16"
+    },
+    "analytical": {
+      "name": "小龙虾-分析方法",
+      "role": "HPLC分析",
+      "icon": "🧪",
+      "status": "waiting",
+      "progress": 0,
+      "activity": "等待任务分配",
+      "stage": "待机",
+      "next_step": "接收任务指令",
+      "last_update": "2026-03-23 09:33:16"
+    },
+    "dissolution": {
+      "name": "小龙虾-溶出方法",
+      "role": "溶出研究",
+      "icon": "💧",
+      "status": "waiting",
+      "progress": 0,
+      "activity": "等待任务分配",
+      "stage": "待机",
+      "next_step": "接收任务指令",
+      "last_update": "2026-03-23 09:33:16"
+    },
+    "data": {
+      "name": "小龙虾-数据管理",
+      "role": "数据管理",
+      "icon": "🔒",
+      "status": "waiting",
+      "progress": 0,
+      "activity": "等待任务分配",
+      "stage": "待机",
+      "next_step": "接收任务指令",
+      "last_update": "2026-03-23 09:33:16"
+    }
+  }
+}

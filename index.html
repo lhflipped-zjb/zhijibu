@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦞 PM大龙虾 - 制剂研发监控看板</title>
+    <style>
+        :root{
+            --bg:#f3f6fb;
+            --panel:#ffffff;
+            --panel-soft:#f8fafc;
+            --text:#0f172a;
+            --muted:#64748b;
+            --line:#e2e8f0;
+            --blue:#2563eb;
+            --blue-soft:#dbeafe;
+            --green:#16a34a;
+            --green-soft:#dcfce7;
+            --yellow:#d97706;
+            --yellow-soft:#fef3c7;
+            --red:#dc2626;
+            --red-soft:#fee2e2;
+            --gray:#94a3b8;
+            --purple:#7c3aed;
+            --purple-soft:#ede9fe;
+            --shadow:0 10px 30px rgba(15,23,42,.08);
+            --r:18px;
+        }
+        *{box-sizing:border-box;margin:0}
+        body{
+            margin:0;
+            background:linear-gradient(180deg,#f7f9fc 0%,#f1f5f9 100%);
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+            color:var(--text);
+            padding:20px;
+            min-height:100vh;
+        }
+        .wrap{max-width:1400px;margin:0 auto}
+        .header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+            flex-wrap:wrap;
+            gap:10px;
+        }
+        .header h1{margin:0;font-size:24px}
+        .header p{margin:6px 0 0;color:var(--muted);font-size:13px}
+        .time{
+            background:var(--panel);
+            padding:8px 12px;
+            border-radius:999px;
+            box-shadow:var(--shadow);
+            font-size:12px;
+            color:var(--muted);
+        }
+        .stats{
+            display:grid;
+            grid-template-columns:repeat(5,1fr);
+            gap:12px;
+            margin-bottom:20px;
+        }
+        .stat{
+            background:var(--panel);
+            border-radius:var(--r);
+            padding:14px 16px;
+            box-shadow:var(--shadow);
+            border:1px solid #edf2f7;
+        }
+        .stat .k{font-size:12px;color:var(--muted)}
+        .stat .v{margin-top:8px;font-size:28px;font-weight:800;line-height:1}
+        .progress-section{
+            background:var(--panel);
+            border-radius:var(--r);
+            padding:16px;
+            box-shadow:var(--shadow);
+            border:1px solid #edf2f7;
+            margin-bottom:20px;
+        }
+        .progress-section h2{margin:0 0 12px;font-size:16px}
+        .progress-bar-container{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+        .progress-bar{
+            flex:1;
+            height:20px;
+            background:#e5e7eb;
+            border-radius:999px;
+            overflow:hidden;
+        }
+        .progress-fill{
+            height:100%;
+            background:linear-gradient(90deg,var(--blue),#3b82f6);
+            border-radius:999px;
+            transition:width 0.5s ease;
+        }
+        .progress-text{font-size:20px;font-weight:800;color:var(--blue)}
+        .agents-grid{
+            display:grid;
+            grid-template-columns:repeat(4,1fr);
+            gap:12px;
+            margin-bottom:20px;
+        }
+        .agent-card{
+            background:var(--panel);
+            border-radius:var(--r);
+            padding:14px;
+            box-shadow:var(--shadow);
+            border:1px solid #edf2f7;
+            position:relative;
+            overflow:hidden;
+        }
+        .agent-card::after{
+            content:"";
+            position:absolute;
+            left:0;
+            top:0;
+            bottom:0;
+            width:4px;
+            background:var(--gray);
+        }
+        .agent-card.running::after{background:var(--blue)}
+        .agent-card.completed::after{background:var(--green)}
+        .agent-card.waiting::after{background:var(--yellow)}
+        .agent-card.error::after{background:var(--red)}
+        .agent-header{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin-bottom:10px;
+        }
+        .agent-avatar{
+            width:36px;
+            height:36px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:18px;
+            background:var(--gray);
+        }
+        .agent-info{flex:1;min-width:0}
+        .agent-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .agent-role{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .agent-status{
+            padding:3px 8px;
+            border-radius:999px;
+            font-size:10px;
+            font-weight:600;
+            background:#e5e7eb;
+            color:#475569;
+            white-space:nowrap;
+        }
+        .agent-status.running{background:var(--blue-soft);color:#1e40af}
+        .agent-status.completed{background:var(--green-soft);color:#166534}
+        .agent-status.waiting{background:var(--yellow-soft);color:#92400e}
+        .agent-activity{
+            font-size:12px;
+            color:var(--muted);
+            margin-bottom:6px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+        .agent-progress{
+            display:flex;
+            justify-content:space-between;
+            font-size:11px;
+            margin-bottom:3px;
+        }
+        .agent-progress-bar{
+            height:6px;
+            background:#e5e7eb;
+            border-radius:999px;
+            overflow:hidden;
+        }
+        .agent-progress-fill{
+            height:100%;
+            background:var(--blue);
+            border-radius:999px;
+            transition:width 0.3s ease;
+        }
+        .refresh-info{
+            text-align:center;
+            color:var(--muted);
+            font-size:11px;
+            margin-top:16px;
+            padding:10px;
+            background:var(--panel);
+            border-radius:8px;
+        }
+        .github-info{
+            background:var(--purple-soft);
+            border:1px solid var(--purple);
+            border-radius:var(--r);
+            padding:16px;
+            margin-bottom:20px;
+        }
+        .github-info h3{margin:0 0 10px;font-size:14px;color:var(--purple)}
+        .github-info p{margin:5px 0;font-size:12px;color:var(--purple)}
+        .github-info a{color:var(--blue);text-decoration:none}
+        .loading{
+            text-align:center;
+            padding:40px;
+            color:var(--muted);
+        }
+        .error{
+            background:var(--red-soft);
+            border:1px solid var(--red);
+            border-radius:var(--r);
+            padding:16px;
+            margin-bottom:20px;
+            color:var(--red);
+        }
+        @media (max-width:1200px){
+            .agents-grid{grid-template-columns:repeat(2,1fr)}
+            .stats{grid-template-columns:repeat(3,1fr)}
+        }
+        @media (max-width:768px){
+            .agents-grid{grid-template-columns:1fr}
+            .stats{grid-template-columns:repeat(2,1fr)}
+            .header h1{font-size:18px}
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <div>
+                <h1>🦞 PM大龙虾 - 制剂研发监控看板</h1>
+                <p id="task-subtitle">加载中...</p>
+            </div>
+            <div class="time" id="current-time">--:--:--</div>
+        </div>
+        
+        <div class="github-info">
+            <h3>🌐 永久访问链接</h3>
+            <p>🔗 <strong>GitHub Pages:</strong> <a href="https://zhijizu.github.io/lobster-dashboard/" target="_blank">https://zhijizu.github.io/lobster-dashboard/</a></p>
+            <p>📱 手机/平板/电脑均可访问 | 数据每30秒自动更新</p>
+            <p>⚠️ 注意：GitHub Pages 使用静态数据，实时数据请查看飞书群推送</p>
+        </div>
+        
+        <div id="loading" class="loading">⏳ 正在加载数据...</div>
+        <div id="error" class="error" style="display:none"></div>
+        
+        <div id="dashboard" style="display:none">
+            <div class="stats">
+                <div class="stat">
+                    <div class="k">活跃Agent</div>
+                    <div class="v" style="color:var(--blue)" id="stat-active">-</div>
+                </div>
+                <div class="stat">
+                    <div class="k">进行中</div>
+                    <div class="v" style="color:var(--green)" id="stat-running">-</div>
+                </div>
+                <div class="stat">
+                    <div class="k">已完成</div>
+                    <div class="v" style="color:var(--gray)" id="stat-completed">-</div>
+                </div>
+                <div class="stat">
+                    <div class="k">等待中</div>
+                    <div class="v" style="color:var(--yellow)" id="stat-waiting">-</div>
+                </div>
+                <div class="stat">
+                    <div class="k">总体进度</div>
+                    <div class="v" style="color:var(--purple);font-size:24px" id="stat-overall">-%</div>
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <h2>📊 总体进度</h2>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overall-progress-bar" style="width:0%"></div>
+                    </div>
+                    <div class="progress-text" id="overall-progress-text">0%</div>
+                </div>
+            </div>
+            
+            <div class="agents-grid" id="agents-container">
+                <!-- Agent卡片将动态生成 -->
+            </div>
+            
+            <div class="refresh-info">
+                ⏱️ 数据每30秒自动刷新 | 任务ID: <span id="task-id">--</span><br>
+                📱 手机/平板/电脑均可访问 | 最后更新: <span id="last-update">--</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 静态数据（嵌入在HTML中，适合GitHub Pages）
+        const STATIC_DATA = {
+            "task_id": "TASK-20260320-001",
+            "task_name": "甲乙型流感儿童患者用新任务处方开发",
+            "start_time": "2026-03-23 09:33:16",
+            "update_time": "2026-03-23 09:33:16",
+            "overall_progress": 11,
+            "status": "进行中",
+            "agents": {
+                "pm": {
+                    "name": "PM大龙虾",
+                    "role": "项目总控",
+                    "icon": "🦞",
+                    "status": "running",
+                    "progress": 10,
+                    "activity": "协调任务",
+                    "stage": "任务调度",
+                    "next_step": "派发任务"
+                },
+                "formulation": {
+                    "name": "小龙虾-处方工艺",
+                    "role": "处方设计",
+                    "icon": "💊",
+                    "status": "running",
+                    "progress": 45,
+                    "activity": "Top1处方已落表，VA64方案已同步",
+                    "stage": "首版落表完成",
+                    "next_step": "补充辅料细节"
+                },
+                "analytical": {
+                    "name": "小龙虾-分析方法",
+                    "role": "HPLC分析",
+                    "icon": "🧪",
+                    "status": "waiting",
+                    "progress": 0,
+                    "activity": "等待任务分配",
+                    "stage": "待机",
+                    "next_step": "接收任务指令"
+                },
+                "dissolution": {
+                    "name": "小龙虾-溶出方法",
+                    "role": "溶出研究",
+                    "icon": "💧",
+                    "status": "waiting",
+                    "progress": 0,
+                    "activity": "等待任务分配",
+                    "stage": "待机",
+                    "next_step": "接收任务指令"
+                },
+                "data": {
+                    "name": "小龙虾-数据管理",
+                    "role": "数据管理",
+                    "icon": "🔒",
+                    "status": "waiting",
+                    "progress": 0,
+                    "activity": "等待任务分配",
+                    "stage": "待机",
+                    "next_step": "接收任务指令"
+                }
+            }
+        };
+
+        // 尝试从外部JSON加载数据（如果可用）
+        async function loadData() {
+            try {
+                // 首先尝试从同目录的data.json加载
+                const response = await fetch('data.json?t=' + Date.now());
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (e) {
+                console.log('外部数据加载失败，使用静态数据');
+            }
+            return STATIC_DATA;
+        }
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                now.toLocaleString('zh-CN', { 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+        }
+
+        function renderDashboard(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            // 更新标题
+            document.getElementById('task-subtitle').textContent = 
+                `任务: ${data.task_name} | 状态: ${data.status}`;
+            
+            // 统计
+            const agents = Object.values(data.agents);
+            const active = agents.filter(a => a.status === 'running').length;
+            const completed = agents.filter(a => a.status === 'completed').length;
+            const waiting = agents.filter(a => a.status === 'waiting' || a.status === 'idle').length;
+            
+            document.getElementById('stat-active').textContent = active;
+            document.getElementById('stat-running').textContent = active;
+            document.getElementById('stat-completed').textContent = completed;
+            document.getElementById('stat-waiting').textContent = waiting;
+            document.getElementById('stat-overall').textContent = data.overall_progress + '%';
+            
+            // 总体进度条
+            document.getElementById('overall-progress-bar').style.width = data.overall_progress + '%';
+            document.getElementById('overall-progress-text').textContent = data.overall_progress + '%';
+            
+            // Agent卡片
+            const container = document.getElementById('agents-container');
+            container.innerHTML = '';
+            
+            for (const [agentId, agent] of Object.entries(data.agents)) {
+                const card = document.createElement('div');
+                card.className = `agent-card ${agent.status}`;
+                
+                const statusText = {
+                    'running': '进行中',
+                    'completed': '已完成',
+                    'waiting': '等待中',
+                    'idle': '待机',
+                    'error': '异常'
+                }[agent.status] || agent.status;
+                
+                card.innerHTML = `
+                    <div class="agent-header">
+                        <div class="agent-avatar">${agent.icon}</div>
+                        <div class="agent-info">
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-role">${agent.role}</div>
+                        </div>
+                        <div class="agent-status ${agent.status}">${statusText}</div>
+                    </div>
+                    <div class="agent-activity">${agent.activity}</div>
+                    <div class="agent-progress">
+                        <span>完成度</span>
+                        <strong>${agent.progress}%</strong>
+                    </div>
+                    <div class="agent-progress-bar">
+                        <div class="agent-progress-fill" style="width:${agent.progress}%"></div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            }
+            
+            // 底部信息
+            document.getElementById('task-id').textContent = data.task_id;
+            document.getElementById('last-update').textContent = data.update_time;
+        }
+
+        async function init() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            const data = await loadData();
+            renderDashboard(data);
+            
+            // 每30秒刷新数据
+            setInterval(async () => {
+                const newData = await loadData();
+                renderDashboard(newData);
+            }, 30000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
