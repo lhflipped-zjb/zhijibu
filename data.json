@@ -1,9 +1,9 @@
 {
-  "task_id": "TASK-20260320-001",
-  "task_name": "甲乙型流感儿童患者用新任务处方开发",
-  "start_time": "2026-03-23 09:33:16",
-  "update_time": "2026-03-23 09:33:16",
-  "overall_progress": 11,
+  "task_id": "TEST-20260324-001",
+  "task_name": "实时同步测试任务",
+  "start_time": "2026-03-24 13:40:00",
+  "update_time": "2026-03-24 13:40:00",
+  "overall_progress": 50,
   "status": "进行中",
   "agents": {
     "pm": {
@@ -11,55 +11,34 @@
       "role": "项目总控",
       "icon": "🦞",
       "status": "running",
-      "progress": 10,
-      "activity": "协调任务",
-      "stage": "任务调度",
-      "next_step": "派发任务",
-      "last_update": "2026-03-23 09:33:16"
+      "progress": 100,
+      "activity": "实时同步测试中",
+      "stage": "验证同步链路",
+      "next_step": "确认网页更新",
+      "last_update": "2026-03-24 13:40:00"
     },
     "formulation": {
       "name": "小龙虾-处方工艺",
       "role": "处方设计",
       "icon": "💊",
       "status": "running",
-      "progress": 45,
-      "activity": "Top1处方已落表，VA64方案已同步",
-      "stage": "首版落表完成",
-      "next_step": "补充辅料细节",
-      "last_update": "2026-03-23 09:33:16"
+      "progress": 60,
+      "activity": "测试数据同步",
+      "stage": "实时更新验证",
+      "next_step": "等待确认",
+      "last_update": "2026-03-24 13:40:00"
     },
     "analytical": {
       "name": "小龙虾-分析方法",
       "role": "HPLC分析",
       "icon": "🧪",
-      "status": "waiting",
-      "progress": 0,
-      "activity": "等待任务分配",
-      "stage": "待机",
-      "next_step": "接收任务指令",
-      "last_update": "2026-03-23 09:33:16"
-    },
-    "dissolution": {
-      "name": "小龙虾-溶出方法",
-      "role": "溶出研究",
-      "icon": "💧",
-      "status": "waiting",
-      "progress": 0,
-      "activity": "等待任务分配",
-      "stage": "待机",
-      "next_step": "接收任务指令",
-      "last_update": "2026-03-23 09:33:16"
-    },
-    "data": {
-      "name": "小龙虾-数据管理",
-      "role": "数据管理",
-      "icon": "🔒",
-      "status": "waiting",
-      "progress": 0,
-      "activity": "等待任务分配",
-      "stage": "待机",
-      "next_step": "接收任务指令",
-      "last_update": "2026-03-23 09:33:16"
+      "status": "running",
+      "progress": 40,
+      "activity": "同步测试进行中",
+      "stage": "验证阶段",
+      "next_step": "确认收到",
+      "last_update": "2026-03-24 13:40:00"
     }
-  }
+  },
+  "milestones_reported": [0, 25, 50]
 }
