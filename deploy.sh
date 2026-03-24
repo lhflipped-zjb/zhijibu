@@ -8,10 +8,10 @@ echo "🦞 PM大龙虾 - GitHub Pages 部署脚本"
 echo "===================================="
 
 # 配置
-REPO_NAME="lobster-dashboard"
-GITHUB_USER="zhijizu"
+REPO_NAME="zhijibu"
+GITHUB_USER="lhflipped-zjb"
 REMOTE_URL="https://github.com/${GITHUB_USER}/${REPO_NAME}.git"
-LOCAL_DIR="/Users/zhijizu/.openclaw/workspace/cloud_dashboard"
+LOCAL_DIR="/Users/zhijizu/.openclaw/workspace/zhijibu"
 
 echo ""
 echo "📋 部署配置:"
@@ -43,10 +43,10 @@ else
 fi
 
 # 创建.gitignore
-cat > .gitignore << 'EOF'
+cat > .gitignore << 'IGNORE'
 .DS_Store
 *.log
-EOF
+IGNORE
 
 # 添加文件
 echo ""
@@ -70,19 +70,8 @@ if git push -u origin main 2>&1; then
     echo ""
     echo "🌐 访问链接:"
     echo "  https://${GITHUB_USER}.github.io/${REPO_NAME}/"
-    echo ""
-    echo "⚠️  注意:"
-    echo "  1. 首次部署可能需要几分钟才能在GitHub Pages生效"
-    echo "  2. 确保GitHub仓库Settings > Pages中Source设置为'Deploy from a branch' -> 'main'"
-    echo "  3. 如果仓库是私有的，页面也是私有的"
 else
     echo ""
     echo "❌ 推送失败"
-    echo ""
-    echo "可能的解决方案:"
-    echo "  1. 检查GitHub仓库是否存在: https://github.com/${GITHUB_USER}/${REPO_NAME}"
-    echo "  2. 创建仓库: gh repo create ${REPO_NAME} --public"
-    echo "  3. 或者手动在GitHub上创建仓库"
-    echo "  4. 检查git凭证: git config --global credential.helper osxkeychain"
     exit 1
 fi

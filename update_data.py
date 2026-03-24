@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 自动更新GitHub Pages看板数据
-从本地task_monitor.json同步到cloud_dashboard/data.json
+从本地task_monitor.json同步到zhijibu/data.json
 """
 
 import json
@@ -15,7 +15,7 @@ def update_dashboard_data():
     # 路径配置
     workspace = Path("/Users/zhijizu/.openclaw/workspace")
     source_file = workspace / "data" / "task_monitor.json"
-    target_file = workspace / "cloud_dashboard" / "data.json"
+    target_file = workspace / "zhijibu" / "data.json"
     
     if not source_file.exists():
         print(f"❌ 源文件不存在: {source_file}")
@@ -51,7 +51,7 @@ def deploy_to_github():
     """部署到GitHub Pages"""
     import subprocess
     
-    dashboard_dir = Path("/Users/zhijizu/.openclaw/workspace/cloud_dashboard")
+    dashboard_dir = Path("/Users/zhijizu/.openclaw/workspace/zhijibu")
     
     try:
         # 进入目录
