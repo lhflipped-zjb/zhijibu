@@ -1,65 +1,86 @@
 {
-  "task_id": "TASK-20260320-001",
-  "task_name": "甲乙型流感儿童患者用新任务处方开发",
-  "start_time": "2026-03-23 09:33:16",
-  "update_time": "2026-03-23 09:33:16",
-  "overall_progress": 11,
-  "status": "进行中",
+  "task_id": "TASK-20260324-001",
+  "task_name": "甲乙型流感儿童患者制剂处方开发",
+  "update_time": "2026-03-24 15:20:35",
+  "public_url": "https://slyvia-eliminative-excusably.ngrok-free.dev",
+  "stats": {
+    "active_agents": 5,
+    "running": 5,
+    "completed": 0,
+    "waiting": 0,
+    "system_status": "正常运行"
+  },
+  "overall_progress": 43,
   "agents": {
     "pm": {
       "name": "PM大龙虾",
-      "role": "项目总控",
+      "role": "项目总控 / 任务调度",
       "icon": "🦞",
       "status": "running",
       "progress": 10,
-      "activity": "协调任务",
+      "activity": "协调甲乙型流感儿童患者制剂处方开发",
       "stage": "任务调度",
-      "next_step": "派发任务",
-      "last_update": "2026-03-23 09:33:16"
+      "next_step": "派发任务给各Agent"
     },
     "formulation": {
       "name": "小龙虾-处方工艺",
-      "role": "处方设计",
+      "role": "处方工艺设计专家",
       "icon": "💊",
       "status": "running",
-      "progress": 45,
-      "activity": "Top1处方已落表，VA64方案已同步",
-      "stage": "首版落表完成",
-      "next_step": "补充辅料细节",
-      "last_update": "2026-03-23 09:33:16"
+      "progress": 50,
+      "activity": "处方筛选完成，推荐VA64型干混悬剂",
+      "stage": "处方确定",
+      "next_step": "完善最优处方细节和工艺参数"
     },
     "analytical": {
       "name": "小龙虾-分析方法",
-      "role": "HPLC分析",
+      "role": "HPLC/GC分析专家",
       "icon": "🧪",
-      "status": "waiting",
-      "progress": 0,
-      "activity": "等待任务分配",
-      "stage": "待机",
-      "next_step": "接收任务指令",
-      "last_update": "2026-03-23 09:33:16"
+      "status": "running",
+      "progress": 50,
+      "activity": "已重申25%进度并预告多维表格创建，将建立色谱草案",
+      "stage": "DOE实验方案设计",
+      "next_step": "建立多维表格，写入DOE数据并确定最终草案"
     },
     "dissolution": {
       "name": "小龙虾-溶出方法",
-      "role": "溶出研究",
+      "role": "溶出度研究专家",
       "icon": "💧",
-      "status": "waiting",
-      "progress": 0,
-      "activity": "等待任务分配",
-      "stage": "待机",
-      "next_step": "接收任务指令",
-      "last_update": "2026-03-23 09:33:16"
+      "status": "running",
+      "progress": 100,
+      "activity": "已输出最终溶出方法推荐方案(桨法+沉降篮+水介质)",
+      "stage": "数据分析与最终方案",
+      "next_step": "方法学验证及f2因子比较(如适用)"
     },
     "data": {
       "name": "小龙虾-数据管理",
-      "role": "数据管理",
+      "role": "数据查询专员",
       "icon": "🔒",
-      "status": "waiting",
-      "progress": 0,
-      "activity": "等待任务分配",
-      "stage": "待机",
-      "next_step": "接收任务指令",
-      "last_update": "2026-03-23 09:33:16"
+      "status": "running",
+      "progress": 5,
+      "activity": "已认领任务，准备数据整理模板",
+      "stage": "任务启动",
+      "next_step": "数据清洗和规范化整理"
     }
-  }
+  },
+  "kanban": {
+    "未启动": [],
+    "进行中": [
+      "协调甲乙型流感儿童患者制剂处方开发",
+      "处方筛选完成，推荐VA64型干混悬剂",
+      "已重申25%进度并预告多维表格创建，将建立色谱草案",
+      "已输出最终溶出方法推荐方案(桨法+沉降篮+水介质)",
+      "已认领任务，准备数据整理模板"
+    ],
+    "待反馈": [],
+    "卡住": [],
+    "已完成": []
+  },
+  "risks": [],
+  "timeline": [
+    {
+      "title": "TASK-20250320-005启动",
+      "desc": "2026-03-20 21:44 · 玛巴洛沙韦儿童制剂，并行快跑策略"
+    }
+  ]
 }
