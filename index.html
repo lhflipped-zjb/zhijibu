@@ -1,466 +1,379 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🦞 PM大龙虾 - 制剂研发监控看板</title>
-    <style>
-        :root{
-            --bg:#f3f6fb;
-            --panel:#ffffff;
-            --panel-soft:#f8fafc;
-            --text:#0f172a;
-            --muted:#64748b;
-            --line:#e2e8f0;
-            --blue:#2563eb;
-            --blue-soft:#dbeafe;
-            --green:#16a34a;
-            --green-soft:#dcfce7;
-            --yellow:#d97706;
-            --yellow-soft:#fef3c7;
-            --red:#dc2626;
-            --red-soft:#fee2e2;
-            --gray:#94a3b8;
-            --purple:#7c3aed;
-            --purple-soft:#ede9fe;
-            --shadow:0 10px 30px rgba(15,23,42,.08);
-            --r:18px;
-        }
-        *{box-sizing:border-box;margin:0}
-        body{
-            margin:0;
-            background:linear-gradient(180deg,#f7f9fc 0%,#f1f5f9 100%);
-            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
-            color:var(--text);
-            padding:20px;
-            min-height:100vh;
-        }
-        .wrap{max-width:1400px;margin:0 auto}
-        .header{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:20px;
-            flex-wrap:wrap;
-            gap:10px;
-        }
-        .header h1{margin:0;font-size:24px}
-        .header p{margin:6px 0 0;color:var(--muted);font-size:13px}
-        .time{
-            background:var(--panel);
-            padding:8px 12px;
-            border-radius:999px;
-            box-shadow:var(--shadow);
-            font-size:12px;
-            color:var(--muted);
-        }
-        .stats{
-            display:grid;
-            grid-template-columns:repeat(5,1fr);
-            gap:12px;
-            margin-bottom:20px;
-        }
-        .stat{
-            background:var(--panel);
-            border-radius:var(--r);
-            padding:14px 16px;
-            box-shadow:var(--shadow);
-            border:1px solid #edf2f7;
-        }
-        .stat .k{font-size:12px;color:var(--muted)}
-        .stat .v{margin-top:8px;font-size:28px;font-weight:800;line-height:1}
-        .progress-section{
-            background:var(--panel);
-            border-radius:var(--r);
-            padding:16px;
-            box-shadow:var(--shadow);
-            border:1px solid #edf2f7;
-            margin-bottom:20px;
-        }
-        .progress-section h2{margin:0 0 12px;font-size:16px}
-        .progress-bar-container{
-            display:flex;
-            align-items:center;
-            gap:12px;
-        }
-        .progress-bar{
-            flex:1;
-            height:20px;
-            background:#e5e7eb;
-            border-radius:999px;
-            overflow:hidden;
-        }
-        .progress-fill{
-            height:100%;
-            background:linear-gradient(90deg,var(--blue),#3b82f6);
-            border-radius:999px;
-            transition:width 0.5s ease;
-        }
-        .progress-text{font-size:20px;font-weight:800;color:var(--blue)}
-        .agents-grid{
-            display:grid;
-            grid-template-columns:repeat(4,1fr);
-            gap:12px;
-            margin-bottom:20px;
-        }
-        .agent-card{
-            background:var(--panel);
-            border-radius:var(--r);
-            padding:14px;
-            box-shadow:var(--shadow);
-            border:1px solid #edf2f7;
-            position:relative;
-            overflow:hidden;
-        }
-        .agent-card::after{
-            content:"";
-            position:absolute;
-            left:0;
-            top:0;
-            bottom:0;
-            width:4px;
-            background:var(--gray);
-        }
-        .agent-card.running::after{background:var(--blue)}
-        .agent-card.completed::after{background:var(--green)}
-        .agent-card.waiting::after{background:var(--yellow)}
-        .agent-card.error::after{background:var(--red)}
-        .agent-header{
-            display:flex;
-            align-items:center;
-            gap:10px;
-            margin-bottom:10px;
-        }
-        .agent-avatar{
-            width:36px;
-            height:36px;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:18px;
-            background:var(--gray);
-        }
-        .agent-info{flex:1;min-width:0}
-        .agent-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .agent-role{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .agent-status{
-            padding:3px 8px;
-            border-radius:999px;
-            font-size:10px;
-            font-weight:600;
-            background:#e5e7eb;
-            color:#475569;
-            white-space:nowrap;
-        }
-        .agent-status.running{background:var(--blue-soft);color:#1e40af}
-        .agent-status.completed{background:var(--green-soft);color:#166534}
-        .agent-status.waiting{background:var(--yellow-soft);color:#92400e}
-        .agent-activity{
-            font-size:12px;
-            color:var(--muted);
-            margin-bottom:6px;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
-        }
-        .agent-progress{
-            display:flex;
-            justify-content:space-between;
-            font-size:11px;
-            margin-bottom:3px;
-        }
-        .agent-progress-bar{
-            height:6px;
-            background:#e5e7eb;
-            border-radius:999px;
-            overflow:hidden;
-        }
-        .agent-progress-fill{
-            height:100%;
-            background:var(--blue);
-            border-radius:999px;
-            transition:width 0.3s ease;
-        }
-        .refresh-info{
-            text-align:center;
-            color:var(--muted);
-            font-size:11px;
-            margin-top:16px;
-            padding:10px;
-            background:var(--panel);
-            border-radius:8px;
-        }
-        .github-info{
-            background:var(--purple-soft);
-            border:1px solid var(--purple);
-            border-radius:var(--r);
-            padding:16px;
-            margin-bottom:20px;
-        }
-        .github-info h3{margin:0 0 10px;font-size:14px;color:var(--purple)}
-        .github-info p{margin:5px 0;font-size:12px;color:var(--purple)}
-        .github-info a{color:var(--blue);text-decoration:none}
-        .loading{
-            text-align:center;
-            padding:40px;
-            color:var(--muted);
-        }
-        .error{
-            background:var(--red-soft);
-            border:1px solid var(--red);
-            border-radius:var(--r);
-            padding:16px;
-            margin-bottom:20px;
-            color:var(--red);
-        }
-        @media (max-width:1200px){
-            .agents-grid{grid-template-columns:repeat(2,1fr)}
-            .stats{grid-template-columns:repeat(3,1fr)}
-        }
-        @media (max-width:768px){
-            .agents-grid{grid-template-columns:1fr}
-            .stats{grid-template-columns:repeat(2,1fr)}
-            .header h1{font-size:18px}
-        }
-    </style>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>🦞 PM大龙虾 - 智能制剂研发任务看板</title>
+ <style>
+ :root{
+ --bg:#f3f6fb;
+ --panel:#ffffff;
+ --panel-soft:#f8fafc;
+ --text:#0f172a;
+ --muted:#64748b;
+ --line:#e2e8f0;
+ --blue:#2563eb;
+ --blue-soft:#dbeafe;
+ --green:#16a34a;
+ --green-soft:#dcfce7;
+ --yellow:#d97706;
+ --yellow-soft:#fef3c7;
+ --red:#dc2626;
+ --red-soft:#fee2e2;
+ --gray:#94a3b8;
+ --purple:#7c3aed;
+ --purple-soft:#ede9fe;
+ --orange:#ea580c;
+ --orange-soft:#ffedd5;
+ --shadow:0 10px 30px rgba(15,23,42,.08);
+ --r:18px;
+ }
+ *{box-sizing:border-box}
+ body{margin:0;background:linear-gradient(180deg,#f7f9fc 0%,#f1f5f9 100%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--text)}
+ .wrap{max-width:1480px;margin:0 auto;padding:28px}
+ .hero{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px}
+ .hero h1{margin:0;font-size:32px;letter-spacing:.2px}
+ .hero p{margin:8px 0 0;color:var(--muted);font-size:14px}
+ .time{background:var(--panel);padding:10px 14px;border-radius:999px;box-shadow:var(--shadow);font-size:13px;color:var(--muted)}
+ .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px}
+ .stat{background:var(--panel);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);border:1px solid #edf2f7}
+ .stat .k{font-size:13px;color:var(--muted)}
+ .stat .v{margin-top:10px;font-size:34px;font-weight:800;line-height:1}
+ .main{display:grid;grid-template-columns:2.1fr 1fr;gap:22px}
+ .panel{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid #edf2f7;padding:18px}
+ .panel-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+ .panel-title h2{margin:0;font-size:18px}
+ .subtag{font-size:12px;color:var(--muted);background:var(--panel-soft);padding:6px 10px;border-radius:999px}
+ .people{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+ .card{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff;position:relative;overflow:hidden}
+ .card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
+ .card.red::after{background:var(--red)}
+ .card.yellow::after{background:var(--yellow)}
+ .card.green::after{background:var(--green)}
+ .card.gray::after{background:var(--gray)}
+ .card.purple::after{background:var(--purple)}
+ .head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+ .identity{display:flex;gap:12px;min-width:0}
+ .avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:18px;font-weight:800;flex:0 0 auto}
+ .avatar.blue{background:#2563eb}.avatar.green{background:#16a34a}.avatar.orange{background:#d97706}.avatar.purple{background:#7c3aed}.avatar.red{background:#dc2626}.avatar.gray{background:#94a3b8}
+ .name{font-weight:800;font-size:16px}.role{font-size:12px;color:var(--muted);margin-top:3px}
+ .badge{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+ .b-green{background:var(--green-soft);color:#166534}.b-yellow{background:var(--yellow-soft);color:#92400e}.b-red{background:var(--red-soft);color:#991b1b}.b-gray{background:#e5e7eb;color:#475569}.b-blue{background:var(--blue-soft);color:#1e40af}.b-purple{background:var(--purple-soft);color:#5b21b6}
+ .meta{display:grid;gap:8px}
+ .row{display:flex;gap:8px;font-size:14px;line-height:1.45}.row .k{width:72px;color:var(--muted);flex:0 0 auto}
+ .progress{margin-top:12px}
+ .progress-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+ .track{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}.fill{height:100%;border-radius:999px}
+ .grid2{display:grid;gap:22px}
+ .warn-list,.timeline{display:grid;gap:12px}
+ .warn,.timecard{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+ .warn strong,.timecard strong{font-size:14px}.muted{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+ .kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+ .col{background:var(--panel-soft);border:1px solid var(--line);border-radius:16px;padding:12px;min-height:220px}
+ .col h3{margin:0 0 10px;font-size:14px}
+ .task{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px}
+ .task .t1{font-size:13px;font-weight:700;line-height:1.4}.task .t2{font-size:12px;color:var(--muted);margin-top:4px}
+ .footer-note{margin-top:18px;color:var(--muted);font-size:12px;text-align:right}
+ .overall-progress{background:var(--panel);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);border:1px solid #edf2f7;margin-bottom:22px}
+ .overall-progress h2{margin:0 0 16px;font-size:18px}
+ .progress-bar-container{display:flex;align-items:center;gap:16px}
+ .progress-bar{flex:1;height:24px;background:#e5e7eb;border-radius:999px;overflow:hidden;position:relative}
+ .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),#3b82f6);border-radius:999px;transition:width 0.5s ease}
+ .progress-text{font-size:24px;font-weight:800;color:var(--blue)}
+ .milestones{display:flex;justify-content:space-between;margin-top:12px;padding:0 8px}
+ .milestone{font-size:12px;color:var(--muted);position:relative}
+ .milestone::before{content:"";position:absolute;top:-16px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:var(--gray);border-radius:50%}
+ .milestone.active::before{background:var(--blue)}
+ .milestone.completed::before{background:var(--green)}
+ @media (max-width:1200px){.main{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.people{grid-template-columns:1fr}.kanban{grid-template-columns:repeat(2,1fr)}}
+ </style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="header">
-            <div>
-                <h1>🦞 PM大龙虾 - 制剂研发监控看板</h1>
-                <p id="task-subtitle">加载中...</p>
-            </div>
-            <div class="time" id="current-time">--:--:--</div>
-        </div>
-        
-        <div class="github-info">
-            <h3>🌐 永久访问链接</h3>
-            <p>🔗 <strong>GitHub Pages:</strong> <a href="https://zhijizu.github.io/lobster-dashboard/" target="_blank">https://zhijizu.github.io/lobster-dashboard/</a></p>
-            <p>📱 手机/平板/电脑均可访问 | 数据每30秒自动更新</p>
-            <p>⚠️ 注意：GitHub Pages 使用静态数据，实时数据请查看飞书群推送</p>
-        </div>
-        
-        <div id="loading" class="loading">⏳ 正在加载数据...</div>
-        <div id="error" class="error" style="display:none"></div>
-        
-        <div id="dashboard" style="display:none">
-            <div class="stats">
-                <div class="stat">
-                    <div class="k">活跃Agent</div>
-                    <div class="v" style="color:var(--blue)" id="stat-active">-</div>
-                </div>
-                <div class="stat">
-                    <div class="k">进行中</div>
-                    <div class="v" style="color:var(--green)" id="stat-running">-</div>
-                </div>
-                <div class="stat">
-                    <div class="k">已完成</div>
-                    <div class="v" style="color:var(--gray)" id="stat-completed">-</div>
-                </div>
-                <div class="stat">
-                    <div class="k">等待中</div>
-                    <div class="v" style="color:var(--yellow)" id="stat-waiting">-</div>
-                </div>
-                <div class="stat">
-                    <div class="k">总体进度</div>
-                    <div class="v" style="color:var(--purple);font-size:24px" id="stat-overall">-%</div>
-                </div>
-            </div>
-            
-            <div class="progress-section">
-                <h2>📊 总体进度</h2>
-                <div class="progress-bar-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="overall-progress-bar" style="width:0%"></div>
-                    </div>
-                    <div class="progress-text" id="overall-progress-text">0%</div>
-                </div>
-            </div>
-            
-            <div class="agents-grid" id="agents-container">
-                <!-- Agent卡片将动态生成 -->
-            </div>
-            
-            <div class="refresh-info">
-                ⏱️ 数据每30秒自动刷新 | 任务ID: <span id="task-id">--</span><br>
-                📱 手机/平板/电脑均可访问 | 最后更新: <span id="last-update">--</span>
-            </div>
-        </div>
-    </div>
+ <div class="wrap">
+ <div class="hero">
+ <div>
+ <h1>🦞 PM大龙虾 - 智能制剂研发任务看板</h1>
+ <p>实时展示8个子Agent状态 · 项目进度可视化 · 风险预警</p>
+ </div>
+ <div class="time">更新时间：2026-03-20 13:20</div>
+ </div>
 
-    <script>
-        // 静态数据（嵌入在HTML中，适合GitHub Pages）
-        const STATIC_DATA = {
-            "task_id": "TASK-20260320-001",
-            "task_name": "甲乙型流感儿童患者用新任务处方开发",
-            "start_time": "2026-03-23 09:33:16",
-            "update_time": "2026-03-23 09:33:16",
-            "overall_progress": 11,
-            "status": "进行中",
-            "agents": {
-                "pm": {
-                    "name": "PM大龙虾",
-                    "role": "项目总控",
-                    "icon": "🦞",
-                    "status": "running",
-                    "progress": 10,
-                    "activity": "协调任务",
-                    "stage": "任务调度",
-                    "next_step": "派发任务"
-                },
-                "formulation": {
-                    "name": "小龙虾-处方工艺",
-                    "role": "处方设计",
-                    "icon": "💊",
-                    "status": "running",
-                    "progress": 45,
-                    "activity": "Top1处方已落表，VA64方案已同步",
-                    "stage": "首版落表完成",
-                    "next_step": "补充辅料细节"
-                },
-                "analytical": {
-                    "name": "小龙虾-分析方法",
-                    "role": "HPLC分析",
-                    "icon": "🧪",
-                    "status": "waiting",
-                    "progress": 0,
-                    "activity": "等待任务分配",
-                    "stage": "待机",
-                    "next_step": "接收任务指令"
-                },
-                "dissolution": {
-                    "name": "小龙虾-溶出方法",
-                    "role": "溶出研究",
-                    "icon": "💧",
-                    "status": "waiting",
-                    "progress": 0,
-                    "activity": "等待任务分配",
-                    "stage": "待机",
-                    "next_step": "接收任务指令"
-                },
-                "data": {
-                    "name": "小龙虾-数据管理",
-                    "role": "数据管理",
-                    "icon": "🔒",
-                    "status": "waiting",
-                    "progress": 0,
-                    "activity": "等待任务分配",
-                    "stage": "待机",
-                    "next_step": "接收任务指令"
-                }
-            }
-        };
+ <section class="stats">
+ <div class="stat"><div class="k">活跃Agent</div><div class="v" style="color:var(--blue)">9</div></div>
+ <div class="stat"><div class="k">进行中</div><div class="v" style="color:var(--green)">0</div></div>
+ <div class="stat"><div class="k">已完成</div><div class="v" style="color:var(--gray)">0</div></div>
+ <div class="stat"><div class="k">等待中</div><div class="v" style="color:var(--yellow)">8</div></div>
+ <div class="stat"><div class="k">系统运行</div><div class="v" style="color:var(--purple);font-size:24px">正常</div></div>
+ </section>
 
-        // 尝试从外部JSON加载数据（如果可用）
-        async function loadData() {
-            try {
-                // 首先尝试从同目录的data.json加载
-                const response = await fetch('data.json?t=' + Date.now());
-                if (response.ok) {
-                    return await response.json();
-                }
-            } catch (e) {
-                console.log('外部数据加载失败，使用静态数据');
-            }
-            return STATIC_DATA;
-        }
+ <section class="overall-progress">
+ <h2>📋 系统总体状态</h2>
+ <div class="progress-bar-container">
+ <div class="progress-bar">
+ <div class="progress-fill" style="width:10%"></div>
+ </div>
+ <div class="progress-text">10%</div>
+ </div>
+ <div class="milestones">
+ <div class="milestone completed">启动</div>
+ <div class="milestone">25%</div>
+ <div class="milestone">50%</div>
+ <div class="milestone">75%</div>
+ <div class="milestone">完成</div>
+ </div>
+ </section>
 
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('current-time').textContent = 
-                now.toLocaleString('zh-CN', { 
-                    month: '2-digit', 
-                    day: '2-digit',
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-        }
+ <section class="main">
+ <div class="grid2">
+ <div class="panel">
+ <div class="panel-title">
+ <h2>🦞 Agent作战卡片</h2>
+ <div class="subtag">头像 + 当前任务 + 阶段 + 完成度</div>
+ </div>
+ <div class="people">
+ <div class="card purple">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar purple">🦞</div>
+ <div><div class="name">PM大龙虾</div><div class="role">项目总控 / 任务调度</div></div>
+ </div>
+ <div class="badge b-blue">调度中</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>系统初始化完成，等待任务派发</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机监控</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:20</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收用户任务指令</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>系统就绪度</span><strong>100%</strong></div>
+ <div class="track"><div class="fill" style="width:100%;background:var(--purple)"></div></div>
+ </div>
+ </div>
 
-        function renderDashboard(data) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            
-            // 更新标题
-            document.getElementById('task-subtitle').textContent = 
-                `任务: ${data.task_name} | 状态: ${data.status}`;
-            
-            // 统计
-            const agents = Object.values(data.agents);
-            const active = agents.filter(a => a.status === 'running').length;
-            const completed = agents.filter(a => a.status === 'completed').length;
-            const waiting = agents.filter(a => a.status === 'waiting' || a.status === 'idle').length;
-            
-            document.getElementById('stat-active').textContent = active;
-            document.getElementById('stat-running').textContent = active;
-            document.getElementById('stat-completed').textContent = completed;
-            document.getElementById('stat-waiting').textContent = waiting;
-            document.getElementById('stat-overall').textContent = data.overall_progress + '%';
-            
-            // 总体进度条
-            document.getElementById('overall-progress-bar').style.width = data.overall_progress + '%';
-            document.getElementById('overall-progress-text').textContent = data.overall_progress + '%';
-            
-            // Agent卡片
-            const container = document.getElementById('agents-container');
-            container.innerHTML = '';
-            
-            for (const [agentId, agent] of Object.entries(data.agents)) {
-                const card = document.createElement('div');
-                card.className = `agent-card ${agent.status}`;
-                
-                const statusText = {
-                    'running': '进行中',
-                    'completed': '已完成',
-                    'waiting': '等待中',
-                    'idle': '待机',
-                    'error': '异常'
-                }[agent.status] || agent.status;
-                
-                card.innerHTML = `
-                    <div class="agent-header">
-                        <div class="agent-avatar">${agent.icon}</div>
-                        <div class="agent-info">
-                            <div class="agent-name">${agent.name}</div>
-                            <div class="agent-role">${agent.role}</div>
-                        </div>
-                        <div class="agent-status ${agent.status}">${statusText}</div>
-                    </div>
-                    <div class="agent-activity">${agent.activity}</div>
-                    <div class="agent-progress">
-                        <span>完成度</span>
-                        <strong>${agent.progress}%</strong>
-                    </div>
-                    <div class="agent-progress-bar">
-                        <div class="agent-progress-fill" style="width:${agent.progress}%"></div>
-                    </div>
-                `;
-                
-                container.appendChild(card);
-            }
-            
-            // 底部信息
-            document.getElementById('task-id').textContent = data.task_id;
-            document.getElementById('last-update').textContent = data.update_time;
-        }
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar green">💊</div>
+ <div><div class="name">小龙虾-处方工艺</div><div class="role">处方工艺设计专家</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:18</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收处方开发任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
 
-        async function init() {
-            updateTime();
-            setInterval(updateTime, 1000);
-            
-            const data = await loadData();
-            renderDashboard(data);
-            
-            // 每30秒刷新数据
-            setInterval(async () => {
-                const newData = await loadData();
-                renderDashboard(newData);
-            }, 30000);
-        }
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar blue">🧪</div>
+ <div><div class="name">小龙虾-分析方法</div><div class="role">HPLC/GC分析专家</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:18</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收分析方法开发任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
 
-        init();
-    </script>
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar orange">💧</div>
+ <div><div class="name">小龙虾-溶出方法</div><div class="role">溶出度研究专家</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:18</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收溶出方法开发任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
+
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar purple">🏭</div>
+ <div><div class="name">小龙虾-放大转移</div><div class="role">工艺放大专家</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:18</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收放大转移任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
+
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar green">🌡️</div>
+ <div><div class="name">小龙虾-稳定性研究</div><div class="role">稳定性试验专家</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:18</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收稳定性研究任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
+
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar orange">📦</div>
+ <div><div class="name">小龙虾-物料管理</div><div class="role">物料库存专员</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:18</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收物料管理任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
+
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar blue">🔒</div>
+ <div><div class="name">小龙虾-数据管理</div><div class="role">数据查询专员</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:15</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收数据整理任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
+
+ <div class="card gray">
+ <div class="head">
+ <div class="identity">
+ <div class="avatar purple">📊</div>
+ <div><div class="name">小龙虾-实验资源调度</div><div class="role">资源调度专员</div></div>
+ </div>
+ <div class="badge b-gray">未启动</div>
+ </div>
+ <div class="meta">
+ <div class="row"><div class="k">当前任务</div><div>等待任务分配</div></div>
+ <div class="row"><div class="k">当前阶段</div><div>待机</div></div>
+ <div class="row"><div class="k">最近更新</div><div>今天 13:18</div></div>
+ <div class="row"><div class="k">下一步</div><div>接收资源调度任务</div></div>
+ </div>
+ <div class="progress">
+ <div class="progress-top"><span>完成度</span><strong>0%</strong></div>
+ <div class="track"><div class="fill" style="width:0%;background:var(--gray)"></div></div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <div class="panel">
+ <div class="panel-title">
+ <h2>📊 任务流转看板</h2>
+ <div class="subtag">按状态看进程</div>
+ </div>
+ <div class="kanban">
+ <div class="col">
+ <h3>🟡 未启动</h3>
+ <div class="task"><div class="t1">处方工艺设计</div><div class="t2">小龙虾-处方工艺</div></div>
+ <div class="task"><div class="t1">分析方法开发</div><div class="t2">小龙虾-分析方法</div></div>
+ <div class="task"><div class="t1">溶出方法开发</div><div class="t2">小龙虾-溶出方法</div></div>
+ <div class="task"><div class="t1">放大转移</div><div class="t2">小龙虾-放大转移</div></div>
+ <div class="task"><div class="t1">稳定性研究</div><div class="t2">小龙虾-稳定性研究</div></div>
+ <div class="task"><div class="t1">物料管理</div><div class="t2">小龙虾-物料管理</div></div>
+ <div class="task"><div class="t1">数据管理</div><div class="t2">小龙虾-数据管理</div></div>
+ <div class="task"><div class="t1">资源调度</div><div class="t2">小龙虾-实验资源调度</div></div>
+ </div>
+ <div class="col">
+ <h3>🔵 进行中</h3>
+ <div class="task" style="opacity:0.5"><div class="t1">暂无任务</div><div class="t2">-</div></div>
+ </div>
+ <div class="col">
+ <h3>🟠 待反馈</h3>
+ <div class="task" style="opacity:0.5"><div class="t1">暂无任务</div><div class="t2">-</div></div>
+ </div>
+ <div class="col">
+ <h3>🔴 卡住</h3>
+ <div class="task" style="opacity:0.5"><div class="t1">暂无任务</div><div class="t2">-</div></div>
+ </div>
+ <div class="col">
+ <h3>🟢 已完成</h3>
+ <div class="task" style="opacity:0.5"><div class="t1">暂无任务</div><div class="t2">-</div></div>
+ </div>
+ </div>
+ <div class="footer-note">数据来源：飞书多维表格实时同步 | 最后更新：2026-03-20 13:20</div>
+ </div>
+ </div>
+
+ <div class="grid2">
+ <div class="panel">
+ <div class="panel-title">
+ <h2>⚠️ 风险 / 阻塞</h2>
+ <div class="subtag">先看该催谁</div>
+ </div>
+ <div class="warn-list">
+ <div class="warn" style="opacity:0.5"><strong>暂无阻塞任务</strong><div class="muted">系统运行正常，所有Agent待命</div></div>
+ </div>
+ </div>
+
+ <div class="panel">
+ <div class="panel-title">
+ <h2>📅 时间进程</h2>
+ <div class="subtag">看整体排期</div>
+ </div>
+ <div class="timeline">
+ <div class="timecard"><strong>系统初始化完成</strong><div class="muted">2026-03-18 完成 · 所有Agent已配置</div></div>
+ <div class="timecard"><strong>等待首个任务</strong><div class="muted">系统就绪 · 等待用户指令</div></div>
+ </div>
+ </div>
+ </div>
+ </section>
+ </div>
 </body>
 </html>
